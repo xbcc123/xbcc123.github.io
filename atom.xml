@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xbcc123.github.io/</id>
     <title>小白菜</title>
-    <updated>2019-10-10T01:06:27.295Z</updated>
+    <updated>2019-10-15T06:55:20.418Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xbcc123.github.io/"/>
     <link rel="self" href="https://xbcc123.github.io//atom.xml"/>
@@ -10,6 +10,126 @@
     <logo>https://xbcc123.github.io//images/avatar.png</logo>
     <icon>https://xbcc123.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, 小白菜</rights>
+    <entry>
+        <title type="html"><![CDATA[babel6下使用jest单元测试]]></title>
+        <id>https://xbcc123.github.io//post/babel6-xia-shi-yong-jest-dan-yuan-ce-shi</id>
+        <link href="https://xbcc123.github.io//post/babel6-xia-shi-yong-jest-dan-yuan-ce-shi">
+        </link>
+        <updated>2019-10-15T06:54:27.000Z</updated>
+        <content type="html"><![CDATA[<p><strong>背景：</strong></p>
+<ol>
+<li>
+<p>项目中后端api地址虽然做了环境变量配置，但是还是有同学随意更改配置导致测试环境地址发布到生产环境</p>
+</li>
+<li>
+<p>为了避免这种情况出现决定引入单元测试，在提交代码之前做一次测试校验</p>
+</li>
+</ol>
+<p><strong>坑：</strong></p>
+<ol>
+<li>
+<p>erp项目使用babel6，jest的babel配置需要babel7, 且无法屏蔽.babelrc配置，哭</p>
+<p>解决方案： jest项目作为一个小项目引入有单独的package.json文件</p>
+</li>
+</ol>
+<p><strong>文件结构：</strong></p>
+<pre><code class="language-js">
+
+├── jest                                           	//  jest项目
+│   ├── babel.config.js                            	//  babel配置
+│   │   ├── ...                              			
+│   ├── jest.config.js                           	//  jest配置
+│   │   ├── ...                              
+│   ├── tests                                  		//  tests文件
+│   │   ├── test.js                                 
+│   │   package.json  								//  依赖包配置
+│   jest.js                                         //  node脚本
+│   .gitignore
+│   package.json	
+
+
+</code></pre>
+<p><strong>配置jest环境</strong></p>
+<p>执行<code>yarn global add jest</code> 或者<code>npm install jest --global</code>安装全局jest</p>
+<p>执行<code>npm init</code> 初始化项目</p>
+<p>执行<code>jest --init</code>初始化jest配置</p>
+<p>执行<code>yarn add --dev babel-jest @babel/core @babel/preset-env</code>下载babel依赖</p>
+<p>到这一步基础配置都安装好了</p>
+<p><strong>babel配置</strong></p>
+<p>babel让jest可以支持es6</p>
+<pre><code class="language-js">
+// babel.config.js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          node: 'current',
+        },
+      },
+    ],
+  ],
+};
+
+</code></pre>
+<p><strong>jest配置</strong></p>
+<p>jest配置指定我们需要匹配测试的文件地址</p>
+<pre><code class="language-js">	
+// jest.config.js 
+
+module.exports = {
+    testMatch: [
+        &quot;**/tests/**/*.[jt]s?(x)&quot;                  // 匹配tests文件夹以及子目录下的文件
+    ],
+}
+
+
+</code></pre>
+<p><strong>引入项目</strong></p>
+<p>因为jest项目是独立于父项目的， 我们要关联这两个项目</p>
+<ol>
+<li>
+<p>配置 <code>.gitignore</code> 隐藏 <code>node_modules</code></p>
+<pre><code class="language-json">
+# .gitignore
+
+node_modules/
+jest/node_modules/
+
+</code></pre>
+</li>
+<li>
+<p><code>npm i shelljs -D</code>  安装<code>shelljs</code>， 使用<code>shelljs</code> 执行jest下的测试文件</p>
+<pre><code class="language-js">
+// jest.js
+
+const shell = require(&quot;shelljs&quot;);
+shell.cd('jest')
+shell.exec('jest')
+
+</code></pre>
+</li>
+<li>
+<p>配置父项目<code>package.json</code></p>
+</li>
+</ol>
+<pre><code class="language-json">
+# package.json    
+
+&quot;scripts&quot;: {
+    &quot;jest&quot;: &quot;node jest&quot;
+}, 
+
+
+</code></pre>
+<p><strong>使用</strong></p>
+<p>执行<code>node jest</code>或<code>npm run jest</code> 使用</p>
+<hr>
+<p><a href="https://github.com/xbcc123/jestTest">git地址</a></p>
+<p><a href="https://jestjs.io/docs/en/getting-started">官网地址</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[git提交规范]]></title>
         <id>https://xbcc123.github.io//post/git-ti-jiao-gui-fan</id>

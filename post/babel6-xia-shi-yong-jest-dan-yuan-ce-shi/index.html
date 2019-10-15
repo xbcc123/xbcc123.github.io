@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>babel6下使用jest单元测试 | 小白菜</title>
+<meta name="description" content="小白菜">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xbcc123.github.io//favicon.ico?v=1571122512287">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://xbcc123.github.io//styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xbcc123.github.io/">
+        <img src="https://xbcc123.github.io//images/avatar.png?v=1571122512287" class="site-logo">
+        <h1 class="site-title">小白菜</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      小白菜
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://xbcc123.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">babel6下使用jest单元测试</h2>
+            <div class="post-date">2019-10-15 14:54:27</div>
+            
+            <div class="post-content">
+              <p><strong>背景：</strong></p>
+<ol>
+<li>
+<p>项目中后端api地址虽然做了环境变量配置，但是还是有同学随意更改配置导致测试环境地址发布到生产环境</p>
+</li>
+<li>
+<p>为了避免这种情况出现决定引入单元测试，在提交代码之前做一次测试校验</p>
+</li>
+</ol>
+<p><strong>坑：</strong></p>
+<ol>
+<li>
+<p>erp项目使用babel6，jest的babel配置需要babel7, 且无法屏蔽.babelrc配置，哭</p>
+<p>解决方案： jest项目作为一个小项目引入有单独的package.json文件</p>
+</li>
+</ol>
+<p><strong>文件结构：</strong></p>
+<pre><code class="language-js">
+
+├── jest                                           	//  jest项目
+│   ├── babel.config.js                            	//  babel配置
+│   │   ├── ...                              			
+│   ├── jest.config.js                           	//  jest配置
+│   │   ├── ...                              
+│   ├── tests                                  		//  tests文件
+│   │   ├── test.js                                 
+│   │   package.json  								//  依赖包配置
+│   jest.js                                         //  node脚本
+│   .gitignore
+│   package.json	
+
+
+</code></pre>
+<p><strong>配置jest环境</strong></p>
+<p>执行<code>yarn global add jest</code> 或者<code>npm install jest --global</code>安装全局jest</p>
+<p>执行<code>npm init</code> 初始化项目</p>
+<p>执行<code>jest --init</code>初始化jest配置</p>
+<p>执行<code>yarn add --dev babel-jest @babel/core @babel/preset-env</code>下载babel依赖</p>
+<p>到这一步基础配置都安装好了</p>
+<p><strong>babel配置</strong></p>
+<p>babel让jest可以支持es6</p>
+<pre><code class="language-js">
+// babel.config.js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          node: 'current',
+        },
+      },
+    ],
+  ],
+};
+
+</code></pre>
+<p><strong>jest配置</strong></p>
+<p>jest配置指定我们需要匹配测试的文件地址</p>
+<pre><code class="language-js">	
+// jest.config.js 
+
+module.exports = {
+    testMatch: [
+        &quot;**/tests/**/*.[jt]s?(x)&quot;                  // 匹配tests文件夹以及子目录下的文件
+    ],
+}
+
+
+</code></pre>
+<p><strong>引入项目</strong></p>
+<p>因为jest项目是独立于父项目的， 我们要关联这两个项目</p>
+<ol>
+<li>
+<p>配置 <code>.gitignore</code> 隐藏 <code>node_modules</code></p>
+<pre><code class="language-json">
+# .gitignore
+
+node_modules/
+jest/node_modules/
+
+</code></pre>
+</li>
+<li>
+<p><code>npm i shelljs -D</code>  安装<code>shelljs</code>， 使用<code>shelljs</code> 执行jest下的测试文件</p>
+<pre><code class="language-js">
+// jest.js
+
+const shell = require(&quot;shelljs&quot;);
+shell.cd('jest')
+shell.exec('jest')
+
+</code></pre>
+</li>
+<li>
+<p>配置父项目<code>package.json</code></p>
+</li>
+</ol>
+<pre><code class="language-json">
+# package.json    
+
+&quot;scripts&quot;: {
+    &quot;jest&quot;: &quot;node jest&quot;
+}, 
+
+
+</code></pre>
+<p><strong>使用</strong></p>
+<p>执行<code>node jest</code>或<code>npm run jest</code> 使用</p>
+<hr>
+<p><a href="https://github.com/xbcc123/jestTest">git地址</a></p>
+<p><a href="https://jestjs.io/docs/en/getting-started">官网地址</a></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xbcc123.github.io//post/git-ti-jiao-gui-fan">
+                  <h3 class="post-title">
+                    git提交规范
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '721bd165c2bc8e2f1c66',
+        clientSecret: '3cbd82c986204a9a1d34f1ab145541c03f6401b1',
+        repo: 'xbcc123.github.io',
+        owner: 'xbcc123',
+        admin: ['xbcc123'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
